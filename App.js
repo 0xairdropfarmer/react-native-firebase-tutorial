@@ -33,7 +33,11 @@ export default class App extends React.Component {
         <Form>
           <Item floatingLabel>
             <Label>Email</Label>
-            <Input autoCapitalize="none" autoCorrect={false} />
+            <Input
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={email => this.setState({ email })}
+            />
           </Item>
           <Item floatingLabel>
             <Label>Password</Label>
@@ -41,12 +45,19 @@ export default class App extends React.Component {
               secureTextEntry={true}
               autoCapitalize="none"
               autoCorrect={false}
+              onChangeText={password => this.setState({ password })}
             />
           </Item>
           <Button full rounded style={{ marginTop: 20 }}>
             <Text>SignIn</Text>
           </Button>
-          <Button full rounded success style={{ marginTop: 20 }}>
+          <Button
+            full
+            rounded
+            success
+            style={{ marginTop: 20 }}
+            onPress={() => this.SignUp(this.state.email, this.state.password)}
+          >
             <Text>Signup</Text>
           </Button>
         </Form>
