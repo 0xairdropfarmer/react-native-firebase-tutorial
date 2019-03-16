@@ -27,6 +27,13 @@ export default class App extends React.Component {
       console.log(error.toString(error));
     }
   };
+  SignIn = (email, password) => {
+    try {
+      firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      console.log(error.toString(error));
+    }
+  };
   render() {
     return (
       <Container style={styles.container}>
@@ -48,7 +55,12 @@ export default class App extends React.Component {
               onChangeText={password => this.setState({ password })}
             />
           </Item>
-          <Button full rounded style={{ marginTop: 20 }}>
+          <Button
+            full
+            rounded
+            style={{ marginTop: 20 }}
+            onPress={() => this.SignIn(this.state.email, this.state.password)}
+          >
             <Text>SignIn</Text>
           </Button>
           <Button
