@@ -1,42 +1,69 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import * as firebase from "firebase";
+import { StyleSheet, Text, View, AsyncStorage } from "react-native";
 import { Container, Item, Form, Input, Button, Label } from "native-base";
-
-var config = {
-  apiKey: "AIzaSyDFdsjQWG8IFLXmviNqSiVZMw_ADFl5tpo",
-  authDomain: "react-native-firebase-3bde9.firebaseapp.com",
-  databaseURL: "https://react-native-firebase-3bde9.firebaseio.com",
-  projectId: "react-native-firebase-3bde9",
-  storageBucket: "react-native-firebase-3bde9.appspot.com",
-  messagingSenderId: "269398778466"
-};
-firebase.initializeApp(config);
+const AccessToken = "Acess Token";
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      accessToken: ""
     };
   }
-  SignUp = (email, password) => {
+  componentDidMount() {
+    console.log(this.state.accessToken);
+    this.getToken();
+  }
+  async storeToken(actk) {
     try {
-      firebase.auth().createUserWithEmailAndPassword(email, password);
+      await AsyncStorage.setItem(AccessToken, actk);
     } catch (error) {
-      console.log(error.toString(error));
+      console.log("Something went wrong", error);
     }
-  };
-  SignIn = (email, password) => {
+  }
+  async getToken(actk) {
     try {
-      firebase.auth().signInWithEmailAndPassword(email, password);
-      firebase.auth().onAuthStateChanged(user => {
-        alert(user.email);
+      let token = await AsyncStorage.getItem(AccessToken);
+      console.log(token);
+    } catch (error) {
+      console.log("Something went wrong");
+    }
+  }
+  async SignIn(email, password) {
+    this.setState({ showProgress: true });
+    try {
+      let response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.password,
+          strategy: "local"
+        })
       });
+      let res = await response.text();
+      if (response.status >= 200 && response.status < 300) {
+        //Handle success
+        this.storeToken(res);
+        // console.log(this.state.accessToken);
+        //On success we will store the access_token in the AsyncStorage
+        // this.storeToken(accessToken);
+        // this.redirect('home');
+      } else {
+        //Handle error
+        let error = res;
+        throw error;
+      }
     } catch (error) {
-      console.log(error.toString(error));
+      this.setState({ error: error });
+      console.log("error " + error);
+      this.setState({ showProgress: false });
     }
-  };
+  }
   render() {
     return (
       <Container style={styles.container}>
